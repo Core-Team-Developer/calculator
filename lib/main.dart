@@ -143,6 +143,22 @@ class _AppState extends State<App> {
     }
   }
 
+  void tapDelete() {
+    setState(() {
+      if (input.length > 1) {
+        input = input.substring(0, input.length - 1);
+      } else {
+        input = "0";
+      }
+    });
+  }
+
+  void tapClear() {
+    setState(() {
+      input = "0";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,9 +207,7 @@ class _AppState extends State<App> {
                   flex: 2,
                   child: InkWell(
                     onTap: () {
-                      setState(() {
-                        input = "0";
-                      });
+                      tapClear();
                     },
                     child: const Action(operation: "CLEAR"),
                   ),
@@ -201,13 +215,7 @@ class _AppState extends State<App> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      setState(() {
-                        if (input.length > 1) {
-                          input = input.substring(0, input.length - 1);
-                        } else {
-                          input = "0";
-                        }
-                      });
+                      tapDelete();
                     },
                     child: const Action(operation: "DEL"),
                   ),
