@@ -50,97 +50,49 @@ class _AppState extends State<App> {
   String input = "0";
 
   double operation(String a, String b, String operasi) {
-    final newA = double.parse(a);
-    final newB = double.parse(b);
+    // 1: hapus nilai return
 
-    switch (operasi) {
-      case "+":
-        return newA + newB;
-      case "-":
-        return newA - newB;
-      case "x":
-        return newA * newB;
-      case "/":
-        return newA / newB;
-      default:
-        return newA + newB;
-    }
+    // 2: parsing nilai a dan b menjadi tipe data double
+
+    // 3: pengkondisian operasi, dan operasikan dengan semestinya, langsung di return
+
+    return 0;
   }
 
   void tapNumber(String value) {
-    setState(() {
-      if (input != "0") {
-        input += value;
-      } else {
-        input = value;
-      }
-    });
+    // 1: Kondisi jika input masih 0, assign value
+
+    // 2: Jika tidak, concat string
   }
 
   void tapOperation(String value) {
-    final list = input.split('');
+    // 1: Membagi string inputan menjadi list dan pendefinisian variabel counter operation
 
-    int countOperation = 0;
+    // 2: Melakukan counter dengan menggunakan looping untuk menghitung jumlah operasi
 
-    for (String numb in list) {
-      if (int.tryParse(numb) == null) {
-        countOperation++;
-      }
-    }
+    // 3: Kondisi Jika Operasi Lebih dari 1, Menampilkan pesan tidak bisa menambah operasi
 
-    if (countOperation > 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.green,
-          content: Text(
-            "Kalkulator hanya menerima satu operasi",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-    } else {
-      setState(() {
-        bool canAddOperation = list.last != value;
-        if (input != "0" && canAddOperation) {
-          input += value.toString();
-        }
-      });
-    }
+    // 4: Kondisi Jika Operasi tidak tersedia, Tambahkan operasi, refresh tampilan
   }
 
   void tapResult() {
-    if (input.contains('+')) {
-      final list = input.split('+');
-      final result = operation(list.first, list.last, '+');
-      setState(() {
-        input = result.toString();
-      });
-    }
+    // 1: Pengecekan input apakah terdapat operasi
 
-    if (input.contains('-')) {
-      final list = input.split('-');
-      final result = operation(list.first, list.last, '-');
-      setState(() {
-        input = result.toString();
-      });
-    }
+    // 2: Jika ada, bagi string operasi menjadi list dengan delimiter operasi diatas
 
-    if (input.contains('x')) {
-      final list = input.split('x');
-      final result = operation(list.first, list.last, 'x');
-      setState(() {
-        input = result.toString();
-      });
-    }
+    // 3: Harus terdapat 2 buah elemen dalam array, lalu panggil fungsi operasi tampung dalam sebuah variabel
 
-    if (input.contains('/')) {
-      final list = input.split('/');
-      final result = operation(list.first, list.last, '/');
-      setState(() {
-        input = result.toString();
-      });
-    }
+    // 4: assign input dengan hasil diatas
+  }
+
+  void tapDelete() {
+    // 1: Kondisi cek panjang string, jika lebih dari satu, hapus karakter terakhir dari input
+
+    // 2: Jika tidak, assignkan nilai 0 dari input
+  }
+
+  void tapClear() {
+    // 1: Assignkan input dengan nilai 0
   }
 
   @override
@@ -148,141 +100,15 @@ class _AppState extends State<App> {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Display(result: input),
-            ),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                childAspectRatio: 4 / 3,
-              ),
-              itemCount: buttons.length,
-              itemBuilder: (context, index) {
-                final button = buttons[index];
-
-                if (int.tryParse(button) != null) {
-                  return InkWell(
-                    onTap: () {
-                      tapNumber(button);
-                    },
-                    child: Number(
-                      number: button,
-                    ),
-                  );
-                } else {
-                  return InkWell(
-                    onTap: () {
-                      tapOperation(button);
-                    },
-                    child: Action(
-                      operation: button,
-                    ),
-                  );
-                }
-              },
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        input = "0";
-                      });
-                    },
-                    child: const Action(operation: "CLEAR"),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        if (input.length > 1) {
-                          input = input.substring(0, input.length - 1);
-                        } else {
-                          input = "0";
-                        }
-                      });
-                    },
-                    child: const Action(operation: "DEL"),
-                  ),
-                ),
-                Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      tapResult();
-                    },
-                    child: const Action(
-                      operation: "=",
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          children: const [
+            // 1: Membuat Widget display dengan parameter input sebagai result
+            // 2: Membuat Widget Gridview dengan jumlah 4 kolom
+            // 3: Gunakan kondisi untuk mengecek number atau operasi
+            // 4: buat widget number dan widget operasi dengan parameter yang sesuai
+            // 5: 2 widget number dan operasi diberi gesture agar dapat di klik
+            // 6: beri 2 widget tersebut fungsi yang sesuai
+            // 5: buat sebuah row untuk operasi final, dan tambahkan fungsi yang sesuai
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class Display extends StatelessWidget {
-  const Display({Key? key, required this.result}) : super(key: key);
-  final String result;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: SelectableText(
-          result,
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class Number extends StatelessWidget {
-  const Number({Key? key, required this.number}) : super(key: key);
-  final String number;
-
-  @override
-  Widget build(BuildContext context) {
-    return Ink(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(border: Border.all(width: 1)),
-        child: Center(
-          child: Text(number),
-        ),
-      ),
-    );
-  }
-}
-
-class Action extends StatelessWidget {
-  const Action({Key? key, required this.operation}) : super(key: key);
-  final String operation;
-
-  @override
-  Widget build(BuildContext context) {
-    return Ink(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(border: Border.all(width: 1)),
-        child: Center(
-          child: Text(operation),
         ),
       ),
     );
