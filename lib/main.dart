@@ -7,109 +7,284 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const App(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class App extends StatefulWidget {
+  const App({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<App> createState() => _AppState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _AppState extends State<App> {
+  // Definisi Variabel
+  List<String> buttons = [
+    '7',
+    '8',
+    '9',
+    '/',
+    '4',
+    '5',
+    '6',
+    'x',
+    '1',
+    '2',
+    '3',
+    '-',
+    '.',
+    '0',
+    '00',
+    '+',
+  ];
 
-  void _incrementCounter() {
+  String input = "0";
+
+  double operation(String a, String b, String operasi) {
+    final newA = double.parse(a);
+    final newB = double.parse(b);
+
+    switch (operasi) {
+      case "+":
+        return newA + newB;
+      case "-":
+        return newA - newB;
+      case "x":
+        return newA * newB;
+      case "/":
+        return newA / newB;
+      default:
+        return newA + newB;
+    }
+  }
+
+  void tapNumber(String value) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      if (input != "0") {
+        input += value;
+      } else {
+        input = value;
+      }
     });
+  }
+
+  void tapOperation(String value) {
+    final list = input.split('');
+
+    int countOperation = 0;
+
+    for (String numb in list) {
+      if (int.tryParse(numb) == null) {
+        countOperation++;
+      }
+    }
+
+    if (countOperation > 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.green,
+          content: Text(
+            "Kalkulator hanya menerima satu operasi",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    } else {
+      setState(() {
+        bool canAddOperation = list.last != value;
+        if (input != "0" && canAddOperation) {
+          input += value.toString();
+        }
+      });
+    }
+  }
+
+  void tapResult() {
+    if (input.contains('+')) {
+      final list = input.split('+');
+      final result = operation(list.first, list.last, '+');
+      setState(() {
+        input = result.toString();
+      });
+    }
+
+    if (input.contains('-')) {
+      final list = input.split('-');
+      final result = operation(list.first, list.last, '-');
+      setState(() {
+        input = result.toString();
+      });
+    }
+
+    if (input.contains('x')) {
+      final list = input.split('x');
+      final result = operation(list.first, list.last, 'x');
+      setState(() {
+        input = result.toString();
+      });
+    }
+
+    if (input.contains('/')) {
+      final list = input.split('/');
+      final result = operation(list.first, list.last, '/');
+      setState(() {
+        input = result.toString();
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
+      body: SafeArea(
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            Expanded(
+              flex: 1,
+              child: Display(result: input),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                childAspectRatio: 4 / 3,
+              ),
+              itemCount: buttons.length,
+              itemBuilder: (context, index) {
+                final button = buttons[index];
+
+                if (int.tryParse(button) != null) {
+                  return InkWell(
+                    onTap: () {
+                      tapNumber(button);
+                    },
+                    child: Number(
+                      number: button,
+                    ),
+                  );
+                } else {
+                  return InkWell(
+                    onTap: () {
+                      tapOperation(button);
+                    },
+                    child: Action(
+                      operation: button,
+                    ),
+                  );
+                }
+              },
+            ),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        input = "0";
+                      });
+                    },
+                    child: const Action(operation: "CLEAR"),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        if (input.length > 1) {
+                          input = input.substring(0, input.length - 1);
+                        } else {
+                          input = "0";
+                        }
+                      });
+                    },
+                    child: const Action(operation: "DEL"),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      tapResult();
+                    },
+                    child: const Action(
+                      operation: "=",
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class Display extends StatelessWidget {
+  const Display({Key? key, required this.result}) : super(key: key);
+  final String result;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: SelectableText(
+          result,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Number extends StatelessWidget {
+  const Number({Key? key, required this.number}) : super(key: key);
+  final String number;
+
+  @override
+  Widget build(BuildContext context) {
+    return Ink(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(border: Border.all(width: 1)),
+        child: Center(
+          child: Text(number),
+        ),
+      ),
+    );
+  }
+}
+
+class Action extends StatelessWidget {
+  const Action({Key? key, required this.operation}) : super(key: key);
+  final String operation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Ink(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(border: Border.all(width: 1)),
+        child: Center(
+          child: Text(operation),
+        ),
+      ),
     );
   }
 }
