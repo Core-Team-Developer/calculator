@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:function_tree/function_tree.dart';
 
 void main() {
   runApp(const MyApp());
@@ -49,98 +50,12 @@ class _AppState extends State<App> {
 
   String input = "0";
 
-  double operation(String a, String b, String operasi) {
-    final newA = double.parse(a);
-    final newB = double.parse(b);
-
-    switch (operasi) {
-      case "+":
-        return newA + newB;
-      case "-":
-        return newA - newB;
-      case "x":
-        return newA * newB;
-      case "/":
-        return newA / newB;
-      default:
-        return newA + newB;
-    }
-  }
-
-  void tapNumber(String value) {
-    setState(() {
-      if (input != "0") {
-        input += value;
-      } else {
-        input = value;
-      }
-    });
-  }
-
-  void tapOperation(String value) {
-    final list = input.split('');
-
-    int countOperation = 0;
-
-    for (String numb in list) {
-      if (int.tryParse(numb) == null) {
-        countOperation++;
-      }
-    }
-
-    if (countOperation > 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.green,
-          content: Text(
-            "Kalkulator hanya menerima satu operasi",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      );
-    } else {
-      setState(() {
-        bool canAddOperation = list.last != value;
-        if (input != "0" && canAddOperation) {
-          input += value.toString();
-        }
-      });
-    }
-  }
-
   void tapResult() {
-    if (input.contains('+')) {
-      final list = input.split('+');
-      final result = operation(list.first, list.last, '+');
-      setState(() {
-        input = result.toString();
-      });
-    }
+    setState(() {
+      final result = input.interpret();
 
-    if (input.contains('-')) {
-      final list = input.split('-');
-      final result = operation(list.first, list.last, '-');
-      setState(() {
-        input = result.toString();
-      });
-    }
-
-    if (input.contains('x')) {
-      final list = input.split('x');
-      final result = operation(list.first, list.last, 'x');
-      setState(() {
-        input = result.toString();
-      });
-    }
-
-    if (input.contains('/')) {
-      final list = input.split('/');
-      final result = operation(list.first, list.last, '/');
-      setState(() {
-        input = result.toString();
-      });
-    }
+      input = result.toString();
+    });
   }
 
   void tapDelete() {
@@ -178,27 +93,24 @@ class _AppState extends State<App> {
               ),
               itemCount: buttons.length,
               itemBuilder: (context, index) {
-                final button = buttons[index];
-
-                if (int.tryParse(button) != null) {
-                  return InkWell(
-                    onTap: () {
-                      tapNumber(button);
-                    },
-                    child: Number(
-                      number: button,
-                    ),
-                  );
-                } else {
-                  return InkWell(
-                    onTap: () {
-                      tapOperation(button);
-                    },
-                    child: Action(
-                      operation: button,
-                    ),
-                  );
-                }
+                String button = buttons[index];
+                return InkWell(
+                  onTap: () {
+                    if (button == 'x') {
+                      button = '*';
+                    }
+                    setState(() {
+                      if (input != "0") {
+                        input += button;
+                      } else {
+                        input = button;
+                      }
+                    });
+                  },
+                  child: Button(
+                    value: button,
+                  ),
+                );
               },
             ),
             Row(
@@ -209,7 +121,7 @@ class _AppState extends State<App> {
                     onTap: () {
                       tapClear();
                     },
-                    child: const Action(operation: "CLEAR"),
+                    child: const Button(value: "CLEAR"),
                   ),
                 ),
                 Expanded(
@@ -217,7 +129,7 @@ class _AppState extends State<App> {
                     onTap: () {
                       tapDelete();
                     },
-                    child: const Action(operation: "DEL"),
+                    child: const Button(value: "DEL"),
                   ),
                 ),
                 Expanded(
@@ -225,8 +137,8 @@ class _AppState extends State<App> {
                     onTap: () {
                       tapResult();
                     },
-                    child: const Action(
-                      operation: "=",
+                    child: const Button(
+                      value: "=",
                     ),
                   ),
                 ),
@@ -261,9 +173,9 @@ class Display extends StatelessWidget {
   }
 }
 
-class Number extends StatelessWidget {
-  const Number({Key? key, required this.number}) : super(key: key);
-  final String number;
+class Button extends StatelessWidget {
+  const Button({Key? key, required this.value}) : super(key: key);
+  final String value;
 
   @override
   Widget build(BuildContext context) {
@@ -272,25 +184,7 @@ class Number extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(border: Border.all(width: 1)),
         child: Center(
-          child: Text(number),
-        ),
-      ),
-    );
-  }
-}
-
-class Action extends StatelessWidget {
-  const Action({Key? key, required this.operation}) : super(key: key);
-  final String operation;
-
-  @override
-  Widget build(BuildContext context) {
-    return Ink(
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(border: Border.all(width: 1)),
-        child: Center(
-          child: Text(operation),
+          child: Text(value),
         ),
       ),
     );
